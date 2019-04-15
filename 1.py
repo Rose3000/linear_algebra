@@ -2,6 +2,7 @@
 import numpy as np
 from scipy import linalg
 from scipy.sparse import diags
+from numpy.linalg import inv
 
 def jacobi(A, b,error):
 	iteration=0
@@ -38,6 +39,29 @@ def Gauss_Seidel(A, b, error_s):
 	print("gauss_seidel:",x)
 	print(iteration)
 
+def SOR(A, b, error_s):
+	iteration=0
+	[m, n] = np.shape(A)
+	w=1.5
+	U = np.triu(A, 1)
+	L = np.tril(A)-np.diag(np.diag(A))
+	D=np.diag(np.diag(A))
+	print("L",L)
+	s1=np.linalg.inv(D+np.dot(w,L))
+	s2=np.dot(w-1,D)+np.dot(w,U)
+	s3=np.dot(w,s1)
+	x = np.ones((m,1))
+	err = np.ones((m,1))*100
+
+	while np.max(err) > error_s:
+		iteration=iteration+1
+		xn=np.dot(np.dot(np.dot(-1,s1),s2),x)+np.dot(s3,b)
+		err = abs((xn - x)/(xn+0.0001))*100
+		x = xn
+
+	print("SOR:",x)
+	print(iteration)
+
 
 def main():
 	n = 100
@@ -58,5 +82,6 @@ def main():
 	x_jacobi=jacobi(A,b,0)
 
 	Gauss_Seidel(A, b, 0)
+	SOR(A, b, 0)
 if __name__ == '__main__':
 	main()
