@@ -38,7 +38,7 @@ def Gauss_Seidel(A, b, error_s):
 
 	print("gauss_seidel:",x)
 	print(iteration)
-
+#x(k+1)=inv(D+wL)(wb-[wU+(w-1)D]x(k))
 def SOR(A, b, error_s):
 	iteration=0
 	[m, n] = np.shape(A)
@@ -46,17 +46,18 @@ def SOR(A, b, error_s):
 	U = np.triu(A, 1)
 	L = np.tril(A)-np.diag(np.diag(A))
 	D=np.diag(np.diag(A))
-	print("L",L)
+	#print("L",L)
+	x = np.ones((m,1))	
 	s1=np.linalg.inv(D+np.dot(w,L))
 	s2=np.dot(w-1,D)+np.dot(w,U)
-	s3=np.dot(w,s1)
-	x = np.ones((m,1))
+	s3=np.dot(s2,x)
+	s4=np.dot(w,b)
 	err = np.ones((m,1))*100
 
 	while np.max(err) > error_s:
 		iteration=iteration+1
-		xn=np.dot(np.dot(np.dot(-1,s1),s2),x)+np.dot(s3,b)
-		err = abs((xn - x)/(xn+0.0001))*100
+		xn=np.dot(s1,s4-s3)
+		err = abs((xn - x)/(xn+0.01))*100
 		x = xn
 
 	print("SOR:",x)
@@ -79,9 +80,9 @@ def main():
 	x2=linalg.solve(A, b)
 	print("the aswer is:",x2)
 
-	x_jacobi=jacobi(A,b,0)
+	x_jacobi=jacobi(A,b,0.0005)
 
-	Gauss_Seidel(A, b, 0)
+	Gauss_Seidel(A, b, 0.0005)
 	SOR(A, b, 0)
 if __name__ == '__main__':
 	main()
